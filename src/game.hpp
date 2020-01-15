@@ -32,7 +32,9 @@ private:
     SDL_Window* window;
     SDL_Renderer* renderer;
 
+    // mouse position
     SDL_Point mouse_pos;
 
+    // Igo board
     Board* board;
 };

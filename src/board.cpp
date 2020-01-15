@@ -1,8 +1,16 @@
 #include <SDL2/SDL.h>
+#include <vector>
 #include "board.hpp"
+#include "stone.hpp"
 
-Board::Board() {}
-Board::~Board() {}
+Board::Board() {
+    stones = new std::vector<Stone>();
+    stones->push_back(Stone(0, 0, true));
+}
+
+Board::~Board() {
+    delete stones;
+}
 
 //---------------------------------
 // update data
@@ -50,5 +58,10 @@ void Board::draw(SDL_Renderer*& renderer, const SDL_Point& mouse_pos) {
             OFFSET_X + GRID_SIZE * (BOARD_X - 1),
             OFFSET_Y + GRID_SIZE * i
         );
+    }
+
+    // draw stones
+    for(auto it = stones->begin(); it != stones->end(); it++) {
+        it->draw(renderer);
     }
 }
