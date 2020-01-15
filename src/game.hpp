@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include "board.hpp"
 
 class GomokuGame {
 public:
@@ -30,4 +31,6 @@ private:
     bool running;
     SDL_Window* window;
     SDL_Renderer* renderer;
+
+    Board* board;
 };

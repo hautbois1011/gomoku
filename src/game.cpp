@@ -1,13 +1,16 @@
 #include "game.hpp"
+#include "board.hpp"
 #include <iostream>
 using namespace std;
 
 GomokuGame::GomokuGame() {
     initSDL();
+    board = new Board();
 }
 
 GomokuGame::~GomokuGame() {
     cleanup();
+    delete board;
 }
 
 //-------------------------------
@@ -78,5 +81,6 @@ void GomokuGame::update() {}
 void GomokuGame::draw() {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderClear(renderer);
+    board->draw(renderer);
     SDL_RenderPresent(renderer);
 }
