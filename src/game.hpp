@@ -32,5 +32,7 @@ private:
     SDL_Window* window;
     SDL_Renderer* renderer;
 
+    SDL_Point mouse_pos;
+
     Board* board;
 };

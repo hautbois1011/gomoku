@@ -7,7 +7,7 @@ public:
     ~Board();
 
     void update();
-    void draw(SDL_Renderer*& renderer);
+    void draw(SDL_Renderer*& renderer, const SDL_Point& mouse_pos);
 private:
     const unsigned short BOARD_X = 13;
     const unsigned short BOARD_Y = 13;

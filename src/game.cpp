@@ -5,6 +5,7 @@ using namespace std;
 
 GomokuGame::GomokuGame() {
     initSDL();
+    mouse_pos = {0, 0};
     board = new Board();
 }
 
@@ -63,8 +64,15 @@ void GomokuGame::cleanup() {
 void GomokuGame::event() {
     SDL_Event e;
     while(SDL_PollEvent(&e)) {
-        if(e.type == SDL_QUIT) {
+        switch(e.type) {
+        case SDL_QUIT:
             running = false;
+            break;
+        case SDL_MOUSEMOTION:
+            SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
+            // cout << "x: " << mouse_pos.x << " y: " << mouse_pos.y << endl;
+            break;
+        default:
             break;
         }
     }
@@ -81,6 +89,8 @@ void GomokuGame::update() {}
 void GomokuGame::draw() {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderClear(renderer);
-    board->draw(renderer);
+
+    board->draw(renderer, mouse_pos);
+
     SDL_RenderPresent(renderer);
 }

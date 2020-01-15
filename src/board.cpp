@@ -12,7 +12,24 @@ void Board::update() {}
 //---------------------------------
 // drawing board
 //---------------------------------
-void Board::draw(SDL_Renderer*& renderer) {
+void Board::draw(SDL_Renderer*& renderer, const SDL_Point& mouse_pos) {
+    // draw mouse over highlight
+    unsigned short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
+    unsigned short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
+
+    if(x >= 0 && y >= 0 && x < BOARD_X && y < BOARD_Y) {
+        SDL_Rect highlight = {
+            OFFSET_X - GRID_SIZE / 2 + x * GRID_SIZE,
+            OFFSET_Y - GRID_SIZE / 2 + y * GRID_SIZE,
+            GRID_SIZE,
+            GRID_SIZE
+        };
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &highlight);
+    }
+
+    // draw board
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
     for(int i = 0; i < BOARD_X; i++) {
