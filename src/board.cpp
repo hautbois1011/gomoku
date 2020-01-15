@@ -6,6 +6,7 @@
 Board::Board() {
     stones = new std::vector<Stone>();
     stones->push_back(Stone(0, 0, true));
+    stones->push_back(Stone(2, 3, false));
 }
 
 Board::~Board() {
@@ -22,8 +23,8 @@ void Board::update() {}
 //---------------------------------
 void Board::draw(SDL_Renderer*& renderer, const SDL_Point& mouse_pos) {
     // draw mouse over highlight
-    unsigned short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
-    unsigned short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
+    short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
+    short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
 
     if(x >= 0 && y >= 0 && x < BOARD_X && y < BOARD_Y) {
         SDL_Rect highlight = {

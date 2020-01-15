@@ -87,7 +87,7 @@ void GomokuGame::update() {}
 // drawing
 //-------------------------------
 void GomokuGame::draw() {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
     SDL_RenderClear(renderer);
 
     board->draw(renderer, mouse_pos);
