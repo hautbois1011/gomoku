@@ -1,19 +1,19 @@
 #include "game.hpp"
 #include "board.hpp"
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 GomokuGame::GomokuGame() {
     initSDL();
     mouse_pos = {0, 0};
     board = new Board();
-    stones = new std::vector<Stone>();
+    stones = std::vector<Stone>();
     turnIsBlack = true;
 }
 
 GomokuGame::~GomokuGame() {
     cleanup();
-    delete stones;
     delete board;
 }
 
@@ -79,11 +79,15 @@ void GomokuGame::event() {
 
         case SDL_MOUSEBUTTONDOWN:
             {
-            short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
-            short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
-            stones->push_back(Stone(x, y, turnIsBlack));
-            turnIsBlack = !turnIsBlack;
-            break;
+                short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
+                short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
+                const Stone s = Stone(x, y, true);
+                if(std::find(stones.begin(), stones.end(), s) == stones.end()
+                        || stones.empty()) {
+                    stones.push_back(Stone(x, y, turnIsBlack));
+                    turnIsBlack = !turnIsBlack;
+                }
+                break;
             }
 
         default:
@@ -107,7 +111,7 @@ void GomokuGame::draw() {
     board->draw(renderer, mouse_pos);
 
     // draw stones
-    for(auto it = stones->begin(); it != stones->end(); it++) {
+    for(auto it = stones.begin(); it != stones.end(); it++) {
         it->draw(renderer);
     }
 

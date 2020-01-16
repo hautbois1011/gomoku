@@ -35,7 +35,7 @@ private:
     SDL_Point mouse_pos;
     bool turnIsBlack;
 
-    std::vector<Stone>* stones;
+    std::vector<Stone> stones;
 
     Board* board;
 };

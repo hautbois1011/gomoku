@@ -10,6 +10,10 @@ public:
     }
     ~Stone();
 
+    bool operator==(const Stone rhs) const {
+        return (this->x == rhs.x && this->y == rhs.y);
+    }
+
     void update();
     void draw(SDL_Renderer*& renderer);
 
