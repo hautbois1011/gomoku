@@ -10,6 +10,12 @@ GomokuGame::GomokuGame() {
     board = new Board();
     stones = std::vector<Stone>();
     turnIsBlack = true;
+    gameEnd = false;
+
+    table = std::vector<std::vector<COLOR>>(
+        BOARD_Y,
+        std::vector<COLOR>(BOARD_X, NONE)
+    );
 }
 
 GomokuGame::~GomokuGame() {
@@ -78,13 +84,65 @@ void GomokuGame::event() {
             break;
 
         case SDL_MOUSEBUTTONDOWN:
+            if(gameEnd) {
+                break;
+            }
+
             {
                 short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
                 short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
+                // cout << "x: " << x << " y: " << y << endl;
+
                 const Stone s = Stone(x, y, true);
                 if(std::find(stones.begin(), stones.end(), s) == stones.end()
                         || stones.empty()) {
                     stones.push_back(Stone(x, y, turnIsBlack));
+                    table[y][x] = turnIsBlack ? BLACK : WHITE;
+
+                    for(auto ity = table.begin(); ity != table.end(); ity++) {
+                        for(auto itx = ity->begin(); itx != ity->end(); itx++) {
+                            cout << *itx << " ";
+                        }
+                        cout << endl;
+                    }
+
+                    cout << "--------------------------" << endl;
+
+                    std::vector<short> rep;                    
+
+                    for(auto vec = VECS.begin(); vec != VECS.end(); vec++) {
+                        short xx = (*vec)[0];
+                        short yy = (*vec)[1];
+                        short count = 0;
+
+                        while(x + xx < BOARD_X && y + yy < BOARD_Y
+                            && x + xx >= 0 && y + yy >= 0
+                            && table[y + yy][x + xx] == (turnIsBlack ? BLACK : WHITE)) {
+                            // cout << "x+xx: " << x+xx << " y+yy: " << y+yy <<endl;
+                            xx += (*vec)[0];
+                            yy += (*vec)[1];
+                            count++;
+                        }
+                        // cout << xx << " " << yy << endl;
+                        // cout << count << endl;
+                        rep.push_back(count);
+                    }
+
+                    cout << "\\: " << rep[0] + rep[7] << endl;
+                    cout << "-: " << rep[1] + rep[6] << endl;
+                    cout << "/: " << rep[2] + rep[5] << endl;
+                    cout << "|: " << rep[3] + rep[4] << endl;
+
+                    cout << "--------------------------" << endl;
+
+                    if(    rep[0] + rep[7] >= 4
+                        || rep[1] + rep[6] >= 4
+                        || rep[2] + rep[5] >= 4
+                        || rep[3] + rep[4] >= 4) {
+                        cout << "game end!" << endl;
+                        gameEnd = true;
+                    }
+
                     turnIsBlack = !turnIsBlack;
                 }
                 break;
