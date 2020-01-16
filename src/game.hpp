@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "board.hpp"
 
 class GomokuGame {
@@ -28,6 +29,9 @@ public:
     void draw();
 
 private:
+    bool judge();
+
+private:
     enum COLOR {
         NONE,
         BLACK,
@@ -48,6 +52,9 @@ private:
     bool running;
     SDL_Window* window;
     SDL_Renderer* renderer;
+    SDL_Surface *surface;
+    SDL_Texture *texture;
+    TTF_Font* font;
 
     SDL_Point mouse_pos;
     bool turnIsBlack;

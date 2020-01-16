@@ -53,6 +53,23 @@ int GomokuGame::initSDL() {
         return 1;
     }
 
+    if(TTF_Init() != 0) {
+        cerr << "TTF Initialization error: " << TTF_GetError() << endl;
+    }
+
+    font = TTF_OpenFont("../font/RictyDiminished-Regular.ttf", 30);
+
+    if(!font) {
+        cerr << "Font opening error: " << endl;
+    }
+
+    surface = TTF_RenderUTF8_Blended(
+        font,
+        "Turn: Black",
+        (SDL_Color){0, 0, 0, 255}
+    );
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+
     running = true;
 
     return 0;
@@ -64,7 +81,12 @@ int GomokuGame::initSDL() {
 void GomokuGame::cleanup() {
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
     SDL_Quit();
+
+    TTF_CloseFont(font);
+    TTF_Quit();
 }
 
 //-------------------------------
@@ -88,70 +110,81 @@ void GomokuGame::event() {
                 break;
             }
 
-            {
-                short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
-                short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
-                // cout << "x: " << x << " y: " << y << endl;
+            if(judge()) {
+                gameEnd = true;
 
-                const Stone s = Stone(x, y, true);
-                if(std::find(stones.begin(), stones.end(), s) == stones.end()
-                        || stones.empty()) {
-                    stones.push_back(Stone(x, y, turnIsBlack));
-                    table[y][x] = turnIsBlack ? BLACK : WHITE;
-
-                    for(auto ity = table.begin(); ity != table.end(); ity++) {
-                        for(auto itx = ity->begin(); itx != ity->end(); itx++) {
-                            cout << *itx << " ";
-                        }
-                        cout << endl;
-                    }
-
-                    cout << "--------------------------" << endl;
-
-                    std::vector<short> rep;                    
-
-                    for(auto vec = VECS.begin(); vec != VECS.end(); vec++) {
-                        short xx = (*vec)[0];
-                        short yy = (*vec)[1];
-                        short count = 0;
-
-                        while(x + xx < BOARD_X && y + yy < BOARD_Y
-                            && x + xx >= 0 && y + yy >= 0
-                            && table[y + yy][x + xx] == (turnIsBlack ? BLACK : WHITE)) {
-                            // cout << "x+xx: " << x+xx << " y+yy: " << y+yy <<endl;
-                            xx += (*vec)[0];
-                            yy += (*vec)[1];
-                            count++;
-                        }
-                        // cout << xx << " " << yy << endl;
-                        // cout << count << endl;
-                        rep.push_back(count);
-                    }
-
-                    cout << "\\: " << rep[0] + rep[7] << endl;
-                    cout << "-: " << rep[1] + rep[6] << endl;
-                    cout << "/: " << rep[2] + rep[5] << endl;
-                    cout << "|: " << rep[3] + rep[4] << endl;
-
-                    cout << "--------------------------" << endl;
-
-                    if(    rep[0] + rep[7] >= 4
-                        || rep[1] + rep[6] >= 4
-                        || rep[2] + rep[5] >= 4
-                        || rep[3] + rep[4] >= 4) {
-                        cout << "game end!" << endl;
-                        gameEnd = true;
-                    }
-
-                    turnIsBlack = !turnIsBlack;
-                }
+                surface = TTF_RenderUTF8_Blended(
+                        font,
+                        "Game Over",
+                        (SDL_Color){0, 0, 0, 255}
+                        );
+                texture = SDL_CreateTextureFromSurface(renderer, surface);
                 break;
             }
+
+
+            if(turnIsBlack) {
+                surface = TTF_RenderUTF8_Blended(
+                        font,
+                        "Turn: Black",
+                        (SDL_Color){0, 0, 0, 255}
+                        );
+            } else {
+                surface = TTF_RenderUTF8_Blended(
+                        font,
+                        "Turn: White",
+                        (SDL_Color){0, 0, 0, 255}
+                        );
+            }
+            texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+            break;
 
         default:
             break;
         }
     }
+}
+
+bool GomokuGame::judge() {
+    short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
+    short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
+    // cout << "x: " << x << " y: " << y << endl;
+
+    const Stone s = Stone(x, y, true);
+    if(std::find(stones.begin(), stones.end(), s) == stones.end()
+            || stones.empty()) {
+        stones.push_back(Stone(x, y, turnIsBlack));
+        table[y][x] = turnIsBlack ? BLACK : WHITE;
+
+        std::vector<short> rep;                    
+
+        for(auto vec = VECS.begin(); vec != VECS.end(); vec++) {
+            short xx = (*vec)[0];
+            short yy = (*vec)[1];
+            short count = 0;
+
+            while(x + xx < BOARD_X && y + yy < BOARD_Y
+                    && x + xx >= 0 && y + yy >= 0
+                    && table[y + yy][x + xx] == (turnIsBlack ? BLACK : WHITE)) {
+                // cout << "x+xx: " << x+xx << " y+yy: " << y+yy <<endl;
+                xx += (*vec)[0];
+                yy += (*vec)[1];
+                count++;
+            }
+            // cout << xx << " " << yy << endl;
+            // cout << count << endl;
+            rep.push_back(count);
+        }
+
+        turnIsBlack = !turnIsBlack;
+
+        return (rep[0] + rep[7] >= 4
+             || rep[1] + rep[6] >= 4
+             || rep[2] + rep[5] >= 4
+             || rep[3] + rep[4] >= 4);
+    }
+    return false;
 }
 
 //-------------------------------
@@ -165,6 +198,14 @@ void GomokuGame::update() {}
 void GomokuGame::draw() {
     SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
     SDL_RenderClear(renderer);
+
+    int iw, ih;
+    SDL_QueryTexture(texture, NULL, NULL, &iw, &ih);
+
+    SDL_Rect txtRect = (SDL_Rect){0, 0, iw, ih};
+    SDL_Rect pasteRect = (SDL_Rect){430, 100, iw, ih};
+
+    SDL_RenderCopy(renderer, texture, &txtRect, &pasteRect);
 
     board->draw(renderer, mouse_pos);
 
