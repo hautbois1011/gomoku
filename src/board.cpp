@@ -4,13 +4,9 @@
 #include "stone.hpp"
 
 Board::Board() {
-    stones = new std::vector<Stone>();
-    stones->push_back(Stone(0, 0, true));
-    stones->push_back(Stone(2, 3, false));
 }
 
 Board::~Board() {
-    delete stones;
 }
 
 //---------------------------------
@@ -61,8 +57,4 @@ void Board::draw(SDL_Renderer*& renderer, const SDL_Point& mouse_pos) {
         );
     }
 
-    // draw stones
-    for(auto it = stones->begin(); it != stones->end(); it++) {
-        it->draw(renderer);
-    }
 }

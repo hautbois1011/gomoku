@@ -7,10 +7,13 @@ GomokuGame::GomokuGame() {
     initSDL();
     mouse_pos = {0, 0};
     board = new Board();
+    stones = new std::vector<Stone>();
+    turnIsBlack = true;
 }
 
 GomokuGame::~GomokuGame() {
     cleanup();
+    delete stones;
     delete board;
 }
 
@@ -68,10 +71,21 @@ void GomokuGame::event() {
         case SDL_QUIT:
             running = false;
             break;
+
         case SDL_MOUSEMOTION:
             SDL_GetMouseState(&mouse_pos.x, &mouse_pos.y);
             // cout << "x: " << mouse_pos.x << " y: " << mouse_pos.y << endl;
             break;
+
+        case SDL_MOUSEBUTTONDOWN:
+            {
+            short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
+            short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
+            stones->push_back(Stone(x, y, turnIsBlack));
+            turnIsBlack = !turnIsBlack;
+            break;
+            }
+
         default:
             break;
         }
@@ -91,6 +105,11 @@ void GomokuGame::draw() {
     SDL_RenderClear(renderer);
 
     board->draw(renderer, mouse_pos);
+
+    // draw stones
+    for(auto it = stones->begin(); it != stones->end(); it++) {
+        it->draw(renderer);
+    }
 
     SDL_RenderPresent(renderer);
 }
