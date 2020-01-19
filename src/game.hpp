@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include "board.hpp"
 
 class GomokuGame {
@@ -38,7 +39,7 @@ private:
         WHITE
     };
 
-    const std::vector<std::vector<short>> VECS = {
+    const std::vector<std::vector<short> > VECS = {
         {1, 1},
         {1, 0},
         {1, -1},
@@ -55,6 +56,7 @@ private:
     SDL_Surface *surface;
     SDL_Texture *texture;
     TTF_Font* font;
+    Mix_Music* music;
 
     SDL_Point mouse_pos;
     bool turnIsBlack;
@@ -63,7 +65,7 @@ private:
     std::vector<Stone> stones;
 
     // count repetation of same color
-    std::vector<std::vector<COLOR>> table;
+    std::vector<std::vector<COLOR> > table;
 
     Board* board;
 };

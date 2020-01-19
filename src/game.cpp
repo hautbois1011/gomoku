@@ -70,6 +70,23 @@ int GomokuGame::initSDL() {
     );
     texture = SDL_CreateTextureFromSurface(renderer, surface);
 
+    int flags = MIX_INIT_MOD;
+    int initted = Mix_Init(flags);
+    if((initted & flags) != flags) {
+        cerr << "SDL Mixer initialization error: " << Mix_GetError() << endl;
+    }
+
+    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+        cerr << "Opening audio error: " << Mix_GetError() << endl;
+    }
+
+    music = Mix_LoadMUS("../sound/gomoku_bgm.wav");
+    if(!music) {
+        cerr << "Cannot load gomoku_bgm.mp3" << endl;
+    }
+
+    Mix_PlayMusic(music, -1);
+
     running = true;
 
     return 0;
@@ -87,6 +104,9 @@ void GomokuGame::cleanup() {
 
     TTF_CloseFont(font);
     TTF_Quit();
+
+    Mix_CloseAudio();
+    Mix_Quit();
 }
 
 //-------------------------------
@@ -146,6 +166,9 @@ void GomokuGame::event() {
     }
 }
 
+//-----------------------------
+// put stone and judge whether ending
+//-----------------------------
 bool GomokuGame::judge() {
     short x = (mouse_pos.x - OFFSET_X + GRID_SIZE / 2) / GRID_SIZE;
     short y = (mouse_pos.y - OFFSET_Y + GRID_SIZE / 2) / GRID_SIZE;
@@ -177,6 +200,7 @@ bool GomokuGame::judge() {
             rep.push_back(count);
         }
 
+        // toggle player
         turnIsBlack = !turnIsBlack;
 
         return (rep[0] + rep[7] >= 4
